@@ -7,16 +7,17 @@ import {
     Button,
     Box,
     Flex,
-    Select,
+    Text,
     CheckboxGroup,
     Checkbox,
     useColorModeValue,
-    Text,
+    useToast,
     SimpleGrid,
 } from '@chakra-ui/react';
 import HorseCreator from '../../components/horsecreator/horsecreator';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
+
 
 function validatePlace(value) {
     let error;
@@ -43,53 +44,19 @@ function validateDate(value) {
     return error;
 }
 
-function DisplayHorses(props) {
-    if (props.horseList.length === 0) {
-        return (
-            <Text isTruncated>
-                You do not seem to have any horses added. <HorseCreator />
-            </Text>
-        );
-    } else {
-        return (
-            <>
-                <CheckboxGroup name='horses' defaultValue={[]} isInline>
-                    <SimpleGrid
-                        columns={{ base: 4, md: 4, lg: 4 }}
-                       >
-                        {props.horseList.map((horse) => (
-                            <div
-                                style={{
-                                    'background-color': horse.color,
-                                    width: '100px',
-                                    borderRadius: '5px',
-                                    padding: '5px',
-                                    marginTop: '5px',
-                                }}>
-                                <Checkbox
-                                    key={horse.id}
-                                    value={horse.id}
-                                    isChecked={false}
-                                    colorScheme={horse.color}>
-                                    {horse.name}
-                                </Checkbox>
-                            </div>
-                        ))}
-                    </SimpleGrid>
-                </CheckboxGroup>
-
-                <Text isTruncated>
-                    Add another horse?
-                    <HorseCreator />
-                </Text>
-            </>
-        );
+function validateBet(value) {
+    let error;
+    if (!value) {
+        error = 'Bet is required';
     }
+
+    return error;
 }
 
 function RaceFormScreen() {
     const formBackground = useColorModeValue('white', 'gray.800');
     const [horseList, setHorseList] = useState([]);
+    const toast = useToast();
 
     useEffect(() => {
         axios
@@ -116,13 +83,43 @@ function RaceFormScreen() {
                 rounded='2xl'
                 p={10}>
                 <Formik
-                    initialValues={{ place: 'Tallinn' }}
-                    onSubmit={(values, actions) => {
-                        setTimeout(() => {
-                            alert(JSON.stringify(values, null, 2));
-                            actions.setSubmitting(false);
-                        }, 1000);
-                    }}>
+                    initialValues={{
+                        place: 'Tallinn',
+                        date: '',
+                        bet: '',
+                        horses: [],
+                    }}
+                    onSubmit={(values, actions) =>
+                        axios
+                            .post(
+                                'http://localhost:8080/api/v1/horsefy/newrace',
+                                {
+                                    place: values.place,
+                                    // Brain gymnastics to get 2 values from checkbox (color, name).
+                                    // Stringifies both values and stores them into array,
+                                    // Here it maps through the array and returns the parsed JSON string
+
+                                    horses: values.horses.map((horse) => {
+                                        return JSON.parse(horse);
+                                    }),
+                                    date: values.date,
+                                    bet: values.bet,
+                                }
+                            )
+                            .then(function (response) {
+                                toast({
+                                    title: 'Race added.',
+                                    description:
+                                        'New race has been saved to the database.',
+                                    status: 'success',
+                                    duration: 9000,
+                                    isClosable: true,
+                                });
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            })
+                    }>
                     {(props) => (
                         <Form>
                             <Field name='place' validate={validatePlace}>
@@ -148,8 +145,7 @@ function RaceFormScreen() {
                                     </FormControl>
                                 )}
                             </Field>
-
-                            <Field name='time' validate={validateDate}>
+                            <Field name='date' validate={validateDate}>
                                 {({ field, form }) => (
                                     <FormControl
                                         isInvalid={
@@ -172,19 +168,92 @@ function RaceFormScreen() {
                                             type={'date'}
                                         />
                                         <FormErrorMessage>
-                                            {form.errors.time}
+                                            {form.errors.date}
                                         </FormErrorMessage>
                                     </FormControl>
                                 )}
                             </Field>
 
-                            <DisplayHorses horseList={horseList} />
+                            <Field name='horses'>
+                                {({ field, form }) => (
+                                    <FormControl
+                                        id='horses'
+                                        isInvalid={
+                                            form.errors.horses &&
+                                            form.touched.horses
+                                        }>
+                                        <FormLabel htmlFor='horses'>
+                                            Horses
+                                        </FormLabel>
+                                        <CheckboxGroup name='horses' isInline>
+                                            <SimpleGrid
+                                                columns={{
+                                                    base: 4,
+                                                    md: 4,
+                                                    lg: 4,
+                                                }}>
+                                                {horseList.map((horse) => (
+                                                    <div
+                                                        style={{
+                                                            backgroundColor:
+                                                                horse.color,
+
+                                                            borderRadius: '5px',
+                                                            padding: '5px',
+                                                            margin: '5px',
+                                                        }}
+                                                        {...field}>
+                                                        <Checkbox
+                                                            key={horse.name}
+                                                            value={JSON.stringify(
+                                                                {
+                                                                    name: horse.name,
+                                                                    color: horse.color,
+                                                                }
+                                                            )}
+                                                            isChecked={false}>
+                                                            {horse.name}
+                                                        </Checkbox>
+                                                    </div>
+                                                ))}
+                                            </SimpleGrid>
+                                        </CheckboxGroup>
+
+                                        <Text isTruncated>
+                                            Add another horse?
+                                            <HorseCreator />
+                                        </Text>
+                                        <FormErrorMessage>
+                                            {form.errors.horses}
+                                        </FormErrorMessage>
+                                    </FormControl>
+                                )}
+                            </Field>
+
+                            <Field name='bet' validate={validateBet}>
+                                {({ field, form }) => (
+                                    <FormControl
+                                        isInvalid={
+                                            form.errors.bet && form.touched.bet
+                                        }>
+                                        <FormLabel htmlFor='bet'>Bet</FormLabel>
+                                        <Input
+                                            {...field}
+                                            size={'lg'}
+                                            id='place'
+                                            type={'text'}
+                                        />
+                                        <FormErrorMessage>
+                                            {form.errors.bet}
+                                        </FormErrorMessage>
+                                    </FormControl>
+                                )}
+                            </Field>
 
                             <Button
                                 mt={4}
                                 colorScheme='blue'
                                 isLoading={props.isSubmitting}
-                                disabled={true}
                                 type='submit'>
                                 Create a race!
                             </Button>

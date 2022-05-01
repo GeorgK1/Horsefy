@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 @AllArgsConstructor
@@ -31,14 +32,14 @@ public class HorsefyService {
     }
 
     public void startHorseRace(HorseRace horseRace) {
-        List<Horse> participants = horseRace.getParticipants();
+        List<Horse> participants = horseRace.getHorses();
         RaceResult result;
         Collections.shuffle(participants);
         //getting a random horse from the participants list
         Horse winner = participants.get(new Random().nextInt(participants.size()));
 
         //saving the result
-        if (winner.getName() == horseRace.getBet()) {
+        if (Objects.equals(winner.getName(), horseRace.getBet())) {
             result = new RaceResult(true, horseRace.getBet(), winner.getName());
         } else {
             result = new RaceResult(false, horseRace.getBet(), winner.getName());
@@ -51,9 +52,7 @@ public class HorsefyService {
         horseRepository.findByName(horse.getName())
                 .ifPresentOrElse(s -> {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Horse with this name already exists!");
-                }, () -> {
-                    horseRepository.save(horse);
-                });
+                }, () -> horseRepository.save(horse));
 
     }
 

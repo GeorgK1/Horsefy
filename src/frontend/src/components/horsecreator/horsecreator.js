@@ -49,16 +49,23 @@ function validateColor(value) {
     return error;
 }
 
+
 function HorseCreator() {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
     const formBackground = useColorModeValue('white', 'gray.800');
+
+    const modalClose = () => {
+        onClose();
+        window.location.reload(false);
+    };
+
     return (
         <>
             <Button variant={'link'} onClick={onOpen}>
                 Click here to add
             </Button>
-            <Modal isOpen={isOpen} onClose={onClose}>
+            <Modal isOpen={isOpen} onClose={modalClose}>
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Create a horse</ModalHeader>
@@ -110,8 +117,9 @@ function HorseCreator() {
 
                                         setTimeout(() => {
                                             actions.setSubmitting(false);
+                                             
                                         }, 1000);
-                                        //window.location.reload(false);
+                                       
                                     }}>
                                     {(props) => (
                                         <Form>
@@ -139,7 +147,7 @@ function HorseCreator() {
                                                         <FormErrorMessage>
                                                             {
                                                                 form.errors
-                                                                    .participants
+                                                                    .name
                                                             }
                                                         </FormErrorMessage>
                                                     </FormControl>

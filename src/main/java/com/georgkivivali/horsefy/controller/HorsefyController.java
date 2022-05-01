@@ -16,17 +16,19 @@ public class HorsefyController {
 
     private final HorsefyService horsefyService;
 
-    @GetMapping
+
+    @GetMapping("/allraces")
     public List<HorseRace> fetchAllHorseRaces() {
         return horsefyService.getAllHorseRaces();
     }
 
-    @PostMapping
+    @PostMapping("/newrace")
     public void registerNewHorseRace(@RequestBody HorseRace horseRace) {
+
         horsefyService.addNewHorseRace(horseRace);
     }
 
-    @PostMapping("/racing")
+    @PostMapping("/startracing")
     public void startRace(@RequestBody HorseRace horseRace) {
         horsefyService.startHorseRace(horseRace);
     }

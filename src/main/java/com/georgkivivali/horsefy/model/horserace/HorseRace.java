@@ -10,14 +10,22 @@ import java.util.Date;
 import java.util.List;
 //Model for the horse races themselves
 @Data
-@Document
+@Document(collection = "horseRace")
 public class HorseRace {
     @Id
     private String id;
+
     private String place;
     @JsonFormat(pattern="yyyy-MM-dd")
-    private Date time;
-    private List<Horse> participants;
+    private Date date;
+    private List<Horse> horses;
     //horse, which the user bet on
     private String bet;
+
+    public HorseRace(String place, Date date, List<Horse> horses, String bet) {
+        this.place = place;
+        this.date = date;
+        this.horses = horses;
+        this.bet = bet;
+    }
 }

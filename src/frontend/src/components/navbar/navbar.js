@@ -4,7 +4,7 @@ import {
     Button,
     Stack,
     useColorMode,
-    Image,
+
 } from '@chakra-ui/react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 
@@ -15,20 +15,22 @@ export default function Nav() {
     return (
         <>
             <Box px={4} boxShadow={'md'}>
-                <Flex
-                    h={'8vh'}
-                    alignItems={'center'}
-                    justifyContent={'center'}>
-                    
-
+                <Flex h={'8vh'} alignItems={'center'} justifyContent={'center'}>
                     <Flex alignItems={'center'}>
                         <Stack direction={'row'} spacing={7}>
+                            <NavLink
+                                href='/racing'
+                                bg={'green.400'}
+                                color={'white'}>
+                                To race
+                            </NavLink>
                             <NavLink
                                 href='/raceform'
                                 bg={'blue.400'}
                                 color={'white'}>
-                                Racing
+                                Add race
                             </NavLink>
+
                             <NavLink href='/results'>Race results</NavLink>
                             <NavLink href='/results'>Horses</NavLink>
 
