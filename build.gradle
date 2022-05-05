@@ -6,7 +6,12 @@ plugins {
 
 group = 'com.georgkivivali'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 
 configurations {
     compileOnly {
@@ -28,9 +33,14 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation("org.assertj:assertj-core:3.11.1")
-    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+
     testImplementation 'org.springframework.security:spring-security-test'
 
+}
+
+jar {
+    archiveBaseName = 'horsefy'
+    archiveVersion = '0.1.0'
 }
 
 tasks.named('test') {

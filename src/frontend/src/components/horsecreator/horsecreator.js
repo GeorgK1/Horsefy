@@ -1,8 +1,5 @@
-import { Formik, Field, Form } from 'formik';
+import { Formik, Form, useField, ErrorMessage } from 'formik';
 import {
-    FormControl,
-    FormLabel,
-    FormErrorMessage,
     Input,
     Button,
     Box,
@@ -15,44 +12,96 @@ import {
     ModalCloseButton,
     useDisclosure,
     useColorModeValue,
-    useToast,
+    Text,
+    createStandaloneToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import { object, string } from 'yup';
 
-function validateName(value) {
-    let error;
+function handleFormSubmit(values, actions) {
+    const toast = createStandaloneToast();
 
-    if (!value) {
-        error = 'Name is required';
-    } else if (value.length < 3) {
-        error = 'Name must be at least 3 characters';
-    } else if (value.length > 15) {
-        error = 'Name must be 15 characters or less';
-    } else if (!/^[a-zA-Z0-9 ]+$/.test(value)) {
-        error = 'Name must be alphanumeric';
-    }
+    axios
+        .post('/api/v1/horsefy/horses', {
+            name: values.name,
+            color: values.color,
+        })
+        .then(() => {
+            toast({
+                title: 'Horse added.',
+                description: 'Horse has been saved to the database.',
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+            });
+        })
+        .catch((error) => {
+            if (error.code === 'ERR_BAD_REQUEST') {
+                toast({
+                    title: 'Error',
+                    description: 'Horse with this name already exists.',
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                });
+            }
+        });
 
-    return error;
+    setTimeout(() => {
+        actions.setSubmitting(false);
+    }, 1000);
+}
+//yup validation schema
+const horseValidation = object().shape({
+    name: string()
+        .min(2, 'Too short')
+        .strict()
+        .max(20, 'Too long')
+        .required('Name is required'),
+    color: string().required('Color is required'),
+});
+
+function NameField() {
+    const [field] = useField('name');
+
+    return (
+        <>
+            <Text>Name</Text>
+            <Input
+                {...field}
+                size={'lg'}
+                id='name'
+                placeholder='i.e Rudolph'
+                type={'text'}
+            />
+
+            <ErrorMessage name={field.name} component='div' />
+        </>
+    );
 }
 
-function validateColor(value) {
-    let error;
+function ColorField() {
+    const [field] = useField('color');
 
-    if (!value) {
-        error = 'Color is required';
-    } else if (value.length < 3) {
-        error = 'Color must be at least 3 characters';
-    } else if (value.length > 15) {
-        error = 'Color must be 15 characters or less';
-    }
+    return (
+        <>
+            <Text>Color</Text>
+            <Input
+                {...field}
+                size={'lg'}
+                id='color'
+                placeholder='i.e. white'
+                type={'color'}
+            />
 
-    return error;
+            <ErrorMessage name={field.name} component='div' />
+        </>
+    );
 }
-
 
 function HorseCreator() {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const toast = useToast();
+
     const formBackground = useColorModeValue('white', 'gray.800');
 
     const modalClose = () => {
@@ -62,7 +111,7 @@ function HorseCreator() {
 
     return (
         <>
-            <Button variant={'link'} onClick={onOpen}>
+            <Button variant={'link'} onClick={onOpen} mx={1}>
                 Click here to add
             </Button>
             <Modal isOpen={isOpen} onClose={modalClose}>
@@ -79,107 +128,16 @@ function HorseCreator() {
                             w={'full'}>
                             <Box bg={formBackground}>
                                 <Formik
-                                    initialValues={{ name: 'Rudolph' }}
-                                    onSubmit={(values, actions) => {
-                                        axios
-                                            .post(
-                                                'http://localhost:8080/api/v1/horsefy/horse',
-                                                {
-                                                    name: values.name,
-                                                    color: values.color,
-                                                }
-                                            )
-                                            .then(function (response) {
-                                                toast({
-                                                    title: 'Horse added.',
-                                                    description:
-                                                        'Horse has been saved to the database.',
-                                                    status: 'success',
-                                                    duration: 9000,
-                                                    isClosable: true,
-                                                });
-                                            })
-                                            .catch(function (error) {
-                                                if (
-                                                    error.code ===
-                                                    'ERR_BAD_REQUEST'
-                                                ) {
-                                                    toast({
-                                                        title: 'Error',
-                                                        description:
-                                                            'Horse with this name already exists.',
-                                                        status: 'error',
-                                                        duration: 9000,
-                                                        isClosable: true,
-                                                    });
-                                                }
-                                            });
-
-                                        setTimeout(() => {
-                                            actions.setSubmitting(false);
-                                             
-                                        }, 1000);
-                                       
-                                    }}>
+                                    initialValues={{
+                                        name: 'Rudolph',
+                                        color: '#F38A73',
+                                    }}
+                                    validationSchema={horseValidation}
+                                    onSubmit={handleFormSubmit}>
                                     {(props) => (
                                         <Form>
-                                            <Field
-                                                name='name'
-                                                validate={validateName}>
-                                                {({ field, form }) => (
-                                                    <FormControl
-                                                        isInvalid={
-                                                            form.errors.name &&
-                                                            form.touched.name
-                                                        }>
-                                                        <FormLabel htmlFor='name'>
-                                                            Horse name
-                                                        </FormLabel>
-
-                                                        <Input
-                                                            {...field}
-                                                            size={'lg'}
-                                                            id='name'
-                                                            placeholder='i.e Rudolph'
-                                                            type={'text'}
-                                                        />
-
-                                                        <FormErrorMessage>
-                                                            {
-                                                                form.errors
-                                                                    .name
-                                                            }
-                                                        </FormErrorMessage>
-                                                    </FormControl>
-                                                )}
-                                            </Field>
-
-                                            <Field
-                                                name='color'
-                                                validate={validateColor}>
-                                                {({ field, form }) => (
-                                                    <FormControl
-                                                        isInvalid={
-                                                            form.errors.color &&
-                                                            form.touched.color
-                                                        }>
-                                                        <FormLabel htmlFor='color'>
-                                                            Horse color
-                                                        </FormLabel>
-
-                                                        <Input
-                                                            {...field}
-                                                            size={'lg'}
-                                                            id='name'
-                                                            type={'color'}
-                                                        />
-
-                                                        <FormErrorMessage>
-                                                            {form.errors.color}
-                                                        </FormErrorMessage>
-                                                    </FormControl>
-                                                )}
-                                            </Field>
+                                            <NameField />
+                                            <ColorField />
 
                                             <Button
                                                 mt={4}

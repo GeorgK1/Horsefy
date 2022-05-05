@@ -2,14 +2,13 @@ package com.georgkivivali.horsefy.model.horse;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 //Horse model
 
 
 @Data
-@Document(collection = "horse")
+@Document
 public class Horse {
     @Id
     private String id;

@@ -31,7 +31,8 @@ public class HorsefyService {
         horseRaceRepository.save(horseRace);
     }
 
-    public void startHorseRace(HorseRace horseRace) {
+    public RaceResult startHorseRace(String raceId) {
+        HorseRace horseRace = horseRaceRepository.findHorseRaceById(raceId);
         List<Horse> participants = horseRace.getHorses();
         RaceResult result;
         Collections.shuffle(participants);
@@ -44,8 +45,12 @@ public class HorsefyService {
         } else {
             result = new RaceResult(false, horseRace.getBet(), winner.getName());
         }
-
+        horseRace.setCompleted(true);
+        System.out.println(horseRace);
         raceResultRepository.save(result);
+        //update the race in db with completed parameter
+        horseRaceRepository.save(horseRace);
+        return result;
     }
 
     public void addNewHorse(Horse horse) {
@@ -58,5 +63,13 @@ public class HorsefyService {
 
     public List<Horse> getAllHorses() {
         return horseRepository.findAll();
+    }
+
+    public List<RaceResult> getAllRaceResults() {
+        return raceResultRepository.findAll();
+    }
+
+    public RaceResult getResultById(String raceId) {
+        return raceResultRepository.getRaceResultById(raceId);
     }
 }

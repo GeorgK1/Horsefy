@@ -5,6 +5,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import RaceScreen from './screens/racescreen/racescreen';
 import RaceFormScreen from './screens/raceformscreen/raceformscreen';
 import Nav from './components/navbar/navbar';
+import ResultScreen from './screens/resultscreen/resultscreen';
+import HorseScreen from './screens/horsescreen/horsescreen';
 function App() {
     return (
         <div className='App'>
@@ -17,6 +19,8 @@ function App() {
                         <Route
                             path='/raceform'
                             element={<RaceFormScreen />}></Route>
+                        <Route path='/results' element={<ResultScreen/>}></Route>
+                        <Route path= '/horses' element={<HorseScreen/>}></Route>
                     </Routes>
                 </BrowserRouter>
             </ChakraProvider>

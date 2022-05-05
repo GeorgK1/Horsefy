@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 //Model for the horse races themselves
 @Data
-@Document(collection = "horseRace")
+@Document
 public class HorseRace {
     @Id
     private String id;
@@ -21,6 +21,7 @@ public class HorseRace {
     private List<Horse> horses;
     //horse, which the user bet on
     private String bet;
+    private Boolean completed;
 
     public HorseRace(String place, Date date, List<Horse> horses, String bet) {
         this.place = place;

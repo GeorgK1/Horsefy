@@ -32,7 +32,7 @@ export default function Nav() {
                             </NavLink>
 
                             <NavLink href='/results'>Race results</NavLink>
-                            <NavLink href='/results'>Horses</NavLink>
+                            <NavLink href='/horses'>Horses</NavLink>
 
                             <Button onClick={toggleColorMode}>
                                 {colorMode === 'light' ? (
