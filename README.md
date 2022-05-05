@@ -22,7 +22,7 @@ Horsefy is a full-stack web application built with Java Spring Boot and React
 * Higher test coverage
 * Animated horses running in the race modal
 
-###How to host?
+### How to host?
 ````
 git clone https://github.com/GeorgK1/Horsefy.git
 
