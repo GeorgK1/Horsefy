@@ -30,7 +30,7 @@ services:
       - "8080:8080"
 
   horsefy-frontend:
-    image: georgkivivali/horsefy-frontend
+    build: ./src/frontend
     restart: unless-stopped
     ports:
       - "80:80"
