@@ -39,11 +39,6 @@ dependencies {
 
 }
 
-jar {
-    archiveBaseName = 'horsefy'
-    archiveVersion = '0.1.0'
-}
-
 tasks.named('test') {
     useJUnitPlatform()
 }
