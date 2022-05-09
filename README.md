@@ -1,7 +1,7 @@
 # Horsefy
 
 ### Introduction
-Horsefy is a full-stack web application built with Java Spring Boot and React. www.horsefy.georgkivivali.com
+Horsefy is a full-stack web application built with Java Spring Boot and React. http://horsefy.georgkivivali.com/
 ![img.png](img.png)
 
 ### Features
